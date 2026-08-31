@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inserir Lição — EBD em Foco</title>
+<style>
+  :root{
+    --ink:#1f2a24;
+    --paper:#f6f3ec;
+    --panel:#ffffff;
+    --line:#d8d2c2;
+    --moss:#3d5a45;
+    --moss-dark:#2b4130;
+    --clay:#a8562f;
+    --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --serif: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    line-height:1.5;
+  }
+  header{
+    padding:2.6rem 1.5rem 1.6rem;
+    border-bottom:1px solid var(--line);
+    max-width:920px;
+    margin:0 auto;
+  }
+  header .kicker{
+    font-family:var(--mono);
+    font-size:0.78rem;
+    letter-spacing:0.02em;
+    color:var(--moss-dark);
+    margin:0 0 0.5rem;
+  }
+  header h1{
+    font-size:clamp(1.6rem, 3vw, 2.15rem);
+    margin:0 0 0.5rem;
+    font-weight:600;
+  }
+  header p{
+    margin:0;
+    max-width:60ch;
+    color:#4b5148;
+  }
+  main{
+    max-width:920px;
+    margin:0 auto;
+    padding:2rem 1.5rem 4rem;
+    display:grid;
+    gap:1.6rem;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:1.5rem;
+  }
+  .panel h2{
+    font-size:1.05rem;
+    margin:0 0 0.2rem;
+    font-weight:600;
+  }
+  .panel .hint{
+    font-size:0.88rem;
+    color:#666f61;
+    margin:0 0 1.1rem;
+  }
+  label{
+    display:block;
+    font-family:var(--mono);
+    font-size:0.76rem;
+    color:var(--moss-dark);
+    margin-bottom:0.35rem;
+  }
+  .field{margin-bottom:1rem;}
+  .field:last-child{margin-bottom:0;}
+  input[type=text], textarea{
+    width:100%;
+    font-family:var(--serif);
+    font-size:0.95rem;
+    padding:0.6rem 0.7rem;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:#fdfcf9;
+    color:var(--ink);
+  }
+  textarea{
+    font-family:var(--mono);
+    font-size:0.8rem;
+    resize:vertical;
+    min-height:170px;
+  }
+  input:focus, textarea:focus{
+    outline:2px solid var(--moss);
+    outline-offset:1px;
+  }
+  .grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1rem;
+  }
+  @media (max-width:640px){
+    .grid2{grid-template-columns:1fr;}
+  }
+  .type-row{
+    display:flex;
+    gap:0.6rem;
+    margin-bottom:1.2rem;
+  }
+  .type-btn{
+    flex:1;
+    padding:0.65rem 0.8rem;
+    border:1px solid var(--line);
+    background:#fdfcf9;
+    border-radius:4px;
+    cursor:pointer;
+    font-family:var(--mono);
+    font-size:0.78rem;
+    text-align:left;
+    color:#555;
+  }
+  .type-btn.active{
+    border-color:var(--moss);
+    background:#eef2ea;
+    color:var(--moss-dark);
+    font-weight:600;
+  }
+  .type-btn small{display:block; font-weight:400; margin-top:0.2rem; color:#7a8074;}
+  fieldset{
+    border:none;
+    padding:0;
+    margin:0;
+  }
+  .onedrive-note{
+    font-size:0.82rem;
+    color:#7a8074;
+    margin-top:0.3rem;
+  }
+  button.run{
+    width:100%;
+    padding:0.85rem;
+    background:var(--moss);
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    font-family:var(--mono);
+    font-size:0.9rem;
+    cursor:pointer;
+    letter-spacing:0.01em;
+  }
+  button.run:hover{background:var(--moss-dark);}
+  button.run:disabled{background:#a9b4a5; cursor:not-allowed;}
+  .msg{
+    font-family:var(--mono);
+    font-size:0.82rem;
+    padding:0.7rem 0.9rem;
+    border-radius:4px;
+    margin-top:1rem;
+    display:none;
+  }
+  .msg.error{display:block; background:#fbe9e4; color:#a8562f; border:1px solid #e6c3b3;}
+  .msg.ok{display:block; background:#eaf1e7; color:var(--moss-dark); border:1px solid #c8d8c3;}
+  .output-actions{
+    display:flex;
+    gap:0.6rem;
+    margin-bottom:0.8rem;
+  }
+  .output-actions button{
+    font-family:var(--mono);
+    font-size:0.78rem;
+    padding:0.5rem 0.9rem;
+    border-radius:4px;
+    border:1px solid var(--line);
+    background:#fdfcf9;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .output-actions button:hover{border-color:var(--moss);}
+  #result{
+    min-height:260px;
+    background:#20241f;
+    color:#e4e6de;
+    border-color:#20241f;
+  }
+  footer{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 1.5rem 3rem;
+    font-size:0.78rem;
+    color:#8b9184;
+    font-family:var(--mono);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="kicker">EBD EM FOCO — FERRAMENTA INTERNA</p>
+  <h1>Inserir uma nova lição no HTML</h1>
+  <p>Cole o código de uma das páginas de trimestre, informe os dados da lição nova e a ferramenta insere o bloco no lugar certo, no mesmo padrão do que já existe.</p>
+</header>
+
+<main>
+
+  <div class="panel">
+    <h2>1. Código atual</h2>
+    <p class="hint">Cole aqui o HTML da página (a mesma que está publicada). O tipo é detectado automaticamente.</p>
+    <div class="field">
+      <textarea id="sourceCode" placeholder="Cole o HTML aqui…"></textarea>
+    </div>
+    <p class="hint" id="typeDetected" style="margin-top:0.7rem;"></p>
+  </div>
+
+  <div class="panel">
+    <h2>2. Dados da lição</h2>
+    <p class="hint">Preencha o número, o título e os links. Campos de PDF e OneDrive só valem para páginas do tipo "normal" (slides do Google Drive).</p>
+
+    <div class="grid2">
+      <div class="field">
+        <label for="lessonNumber">Número da lição</label>
+        <input type="text" id="lessonNumber" placeholder="Ex: 10">
+      </div>
+      <div class="field">
+        <label for="lessonTitle">Título da lição</label>
+        <input type="text" id="lessonTitle" placeholder="Ex: Uma esperança inabalável perante os poderosos">
+      </div>
+    </div>
+
+    <div class="field" id="slideLinkField">
+      <label for="slideLink">Link do slide (Google Drive, compartilhamento) — página "normal" — ou link direto do Mediafire — página "app"</label>
+      <input type="text" id="slideLink" placeholder="Cole o link de compartilhamento do Drive ou o link do Mediafire">
+    </div>
+
+    <div class="field" id="pdfLinkField">
+      <label for="pdfLink">Link do PDF (Google Drive, compartilhamento) — opcional, só para páginas "normal"</label>
+      <input type="text" id="pdfLink" placeholder="Cole o link de compartilhamento do PDF">
+    </div>
+
+    <div class="field" id="onedriveField">
+      <label for="onedriveLink">Link alternativo do OneDrive — opcional, se vazio reaproveita o que já está no código</label>
+      <input type="text" id="onedriveLink" placeholder="Deixe em branco para reaproveitar o link existente">
+    </div>
+
+    <button class="run" id="runBtn">Inserir lição no código</button>
+    <div class="msg" id="msgBox"></div>
+  </div>
+
+  <div class="panel" id="outputPanel" style="display:none;">
+    <h2>3. Código atualizado</h2>
+    <p class="hint">Copie e cole de volta no seu construtor de páginas, ou baixe o arquivo .txt.</p>
+    <div class="output-actions">
+      <button id="copyBtn">Copiar código</button>
+      <button id="downloadBtn">Baixar .txt</button>
+    </div>
+    <textarea id="result" readonly></textarea>
+  </div>
+
+</main>
+
+<footer>
+  Roda inteiramente no seu navegador — nada é enviado a servidor nenhum.
+</footer>
+
+<script>
+(function(){
+  const sourceCode   = document.getElementById('sourceCode');
+  const typeDetected = document.getElementById('typeDetected');
+  const lessonNumber = document.getElementById('lessonNumber');
+  const lessonTitle  = document.getElementById('lessonTitle');
+  const slideLink    = document.getElementById('slideLink');
+  const pdfLink      = document.getElementById('pdfLink');
+  const pdfField     = document.getElementById('pdfLinkField');
+  const onedriveLink = document.getElementById('onedriveLink');
+  const onedriveField= document.getElementById('onedriveField');
+  const runBtn       = document.getElementById('runBtn');
+  const msgBox       = document.getElementById('msgBox');
+  const outputPanel  = document.getElementById('outputPanel');
+  const result       = document.getElementById('result');
+  const copyBtn      = document.getElementById('copyBtn');
+  const downloadBtn  = document.getElementById('downloadBtn');
+
+  function detectType(code){
+    if(!code.trim()) return null;
+    if(code.includes('btn btn-primary') || code.includes('target="_top"')) return 'app';
+    if(code.includes('docs.google.com/uc?export=download')) return 'normal';
+    return null;
+  }
+
+  function updateTypeUI(){
+    const type = detectType(sourceCode.value);
+    if(type === 'normal'){
+      typeDetected.textContent = 'Tipo detectado: página "normal" (links do Google Drive + PDF + OneDrive).';
+      pdfField.style.display = '';
+      onedriveField.style.display = '';
+    } else if(type === 'app'){
+      typeDetected.textContent = 'Tipo detectado: página "app" (botão único do Mediafire).';
+      pdfField.style.display = 'none';
+      onedriveField.style.display = 'none';
+    } else {
+      typeDetected.textContent = sourceCode.value.trim() ? 'Não consegui identificar o tipo da página — confira se colou o código completo.' : '';
+      pdfField.style.display = '';
+      onedriveField.style.display = '';
+    }
+  }
+  sourceCode.addEventListener('input', updateTypeUI);
+
+  function showMsg(text, isError){
+    msgBox.textContent = text;
+    msgBox.className = 'msg ' + (isError ? 'error' : 'ok');
+  }
+
+  function extractDriveId(url){
+    if(!url) return null;
+    const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    return m ? m[1] : null;
+  }
+
+  function driveDownloadLink(shareUrl){
+    const id = extractDriveId(shareUrl);
+    if(!id) return null;
+    return 'https://docs.google.com/uc?export=download&id=' + id;
+  }
+
+  function existingIds(code){
+    const ids = new Set();
+    const re = /id="([a-zA-Z0-9_-]+)"/g;
+    let m;
+    while((m = re.exec(code)) !== null){ ids.add(m[1]); }
+    return ids;
+  }
+
+  function makeUniqueId(code, prefix){
+    const used = existingIds(code);
+    let id;
+    do {
+      id = prefix + Math.random().toString(36).slice(2, 6);
+    } while(used.has(id));
+    return id;
+  }
+
+  function escapeHtml(str){
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function findExistingOnedrive(code){
+    const m = code.match(/https:\/\/1drv\.ms\/[^"]+/);
+    return m ? m[0] : null;
+  }
+
+  function insertNormal(code, num, title, slideShareUrl, pdfShareUrl, onedriveUrl){
+    const slideDl = driveDownloadLink(slideShareUrl);
+    if(!slideDl) throw new Error('Não consegui identificar o ID do link do slide. Confira se é um link de compartilhamento do Google Drive (contém "/d/...").');
+
+    let pdfDl = null;
+    if(pdfShareUrl && pdfShareUrl.trim()){
+      pdfDl = driveDownloadLink(pdfShareUrl);
+      if(!pdfDl) throw new Error('Não consegui identificar o ID do link do PDF. Confira se é um link de compartilhamento do Google Drive.');
+    }
+
+    let onedrive = onedriveUrl && onedriveUrl.trim() ? onedriveUrl.trim() : findExistingOnedrive(code);
+
+    const id = makeUniqueId(code, 'il');
+    const safeTitle = escapeHtml(title);
+
+    let pdfBlock = '';
+    if(pdfDl){
+      const altLine = onedrive
+        ? `\n\t\t  <strong><a class="link" href="${onedrive}" id="igo0eb" rel="nofollow" target="_blank" title=""><span style="color:#c0392b;">Lição ${num} (SE NENHUM DOS LINKS ACIMA FUNCIONAR, CLIQUE AQUI.)</span></a></strong></span>`
+        : `</span>`;
+      pdfBlock = `\n\t\t<span style="font-size:22px;"><a href="${pdfDl}" rel="nofollow" title="">Lição ${num} - ${safeTitle}\n\t\t  (VERSÃO EM PDF)</a><br>${altLine}\n\t\t<br>`;
+    }
+
+    const block =
+`\t  <p id="${id}" class="text">
+\t\t<span style="font-size:22px;"><a href="${slideDl}" rel="nofollow" title="">Lição ${num} - ${safeTitle}
+\t\t  </a><br>
+\t\t  <a href="${slideDl}" rel="noopener noreferrer" target="_blank"><strong>Lição ${num} - ${safeTitle}
+\t\t\t</strong></a></span>
+\t\t<br>${pdfBlock}
+\t\t<br>
+\t  </p>
+`;
+
+    // Find the first lesson <p> block (the one right after the intro paragraph)
+    const anchorMatch = code.match(/\t  <p id="[^"]*" class="text">\s*\n\s*<span style="font-size:22px;"><a href="https:\/\/docs\.google\.com\/uc\?export=download/);
+    if(!anchorMatch){
+      throw new Error('Não encontrei onde inserir o bloco novo — o código colado não parece seguir o padrão esperado.');
+    }
+    const insertAt = anchorMatch.index;
+    return code.slice(0, insertAt) + block + code.slice(insertAt);
+  }
+
+  function insertApp(code, num, title, mediafireUrl){
+    if(!mediafireUrl || !mediafireUrl.trim()) throw new Error('Cole o link direto do Mediafire para a página "app".');
+    const link = mediafireUrl.trim();
+    const safeTitle = escapeHtml(title);
+    const id = makeUniqueId(code, 'il');
+
+    const anchorMatch = code.match(/\t  <a target="_top" href="[^"]*" id="([a-zA-Z0-9_-]+)" class="btn btn-primary">/);
+    if(!anchorMatch){
+      throw new Error('Não encontrei um botão existente para usar como modelo — confira se o código colado é de uma página "app".');
+    }
+    const anchorId = anchorMatch[1];
+    const insertAt = anchorMatch.index;
+
+    const newButton = `\t  <a target="_top" href="${link}" id="${id}" class="btn btn-primary">Lição ${num} - ${safeTitle}</a>\n`;
+    let updated = code.slice(0, insertAt) + newButton + code.slice(insertAt);
+
+    // reuse the anchor button's CSS rule for the new button
+    const cssRuleRe = new RegExp('#' + anchorId + '\\{[^}]*\\}');
+    const cssMatch = updated.match(cssRuleRe);
+    if(cssMatch){
+      const newRule = cssMatch[0].replace(new RegExp('#' + anchorId), '#' + id);
+      updated = updated.replace(cssMatch[0], newRule + '\n  ' + cssMatch[0]);
+    }
+    return updated;
+  }
+
+  runBtn.addEventListener('click', function(){
+    msgBox.className = 'msg';
+    outputPanel.style.display = 'none';
+
+    const code = sourceCode.value;
+    const type = detectType(code);
+    const num = lessonNumber.value.trim();
+    const title = lessonTitle.value.trim();
+
+    if(!code.trim()){ showMsg('Cole o código da página primeiro.', true); return; }
+    if(!type){ showMsg('Não consegui identificar o tipo da página. Confira o código colado.', true); return; }
+    if(!num){ showMsg('Informe o número da lição.', true); return; }
+    if(!title){ showMsg('Informe o título da lição.', true); return; }
+
+    try {
+      let updated;
+      if(type === 'normal'){
+        updated = insertNormal(code, num, title, slideLink.value.trim(), pdfLink.value.trim(), onedriveLink.value.trim());
+      } else {
+        updated = insertApp(code, num, title, slideLink.value.trim());
+      }
+      result.value = updated;
+      outputPanel.style.display = '';
+      showMsg('Lição ' + num + ' inserida com sucesso.', false);
+    } catch(err){
+      showMsg(err.message, true);
+    }
+  });
+
+  copyBtn.addEventListener('click', function(){
+    result.select();
+    navigator.clipboard.writeText(result.value).then(function(){
+      copyBtn.textContent = 'Copiado!';
+      setTimeout(function(){ copyBtn.textContent = 'Copiar código'; }, 1500);
+    });
+  });
+
+  downloadBtn.addEventListener('click', function(){
+    const blob = new Blob([result.value], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pagina-atualizada.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+})();
+</script>
+
+</body>
+</html>
